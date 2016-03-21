@@ -9,6 +9,9 @@ import (
 	"github.com/jmoiron/sqlx/reflectx"
 )
 
+// ColumnNameMapper is the function used by SetKeys to map the given field names to database column names.
+var ColumnNameMapper = strings.ToLower
+
 // TableMap represents a mapping between a Go struct and a database table
 // Use dbmap.AddTable() or dbmap.AddTableWithName() to create these
 type TableMap struct {
@@ -52,9 +55,8 @@ func (t *TableMap) ResetSql() {
 func (t *TableMap) SetKeys(isAutoIncr bool, fieldNames ...string) *TableMap {
 	t.Keys = make([]*ColumnMap, 0)
 	for _, name := range fieldNames {
-		// FIXME: sqlx.NameMapper is a deprecated API.  modl should have its
-		// own API which sets sqlx's mapping funcs as necessary
-		colmap := t.ColMap(sqlx.NameMapper(name))
+		// FIXME: the name mapper should really not be package state
+		colmap := t.ColMap(ColumnNameMapper(name))
 		colmap.isPK = true
 		colmap.isAutoIncr = isAutoIncr
 		t.Keys = append(t.Keys, colmap)
