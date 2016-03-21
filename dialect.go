@@ -282,6 +282,8 @@ func (d PostgresDialect) InsertAutoIncrAny(e SqlExecutor, insertSql string, dest
 
 // QuoteField quotes f with ""
 func (d PostgresDialect) QuoteField(f string) string {
+	// FIXME-1: this function should not be called from this package ever
+	// FIXME-2: no name mapping should be happening here anyways
 	return `"` + sqlx.NameMapper(f) + `"`
 }
 
